@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0e7c47">
+<title>⚽ 世界杯智能投注助手 · AI 预测 v3.1</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1c2128;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --primary: #0e7c47;
+  --primary2: #2ea043;
+  --gold: #d4a017;
+  --red: #f85149;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --blue: #58a6ff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+body { max-width: 560px; margin: 0 auto; padding-bottom: 80px; min-height: 100vh; }
+
+/* Header */
+.header {
+  padding: 18px 16px 12px;
+  background: linear-gradient(180deg, #0e7c47 0%, rgba(13,17,23,0.3) 100%);
+}
+.header h1 { font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.header .sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+.header .meta { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+
+/* Tabs */
+.tabs {
+  display: flex; background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 99;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.tab {
+  flex: 1; padding: 13px 4px; text-align: center;
+  font-size: 13px; color: var(--muted);
+  cursor: pointer; position: relative; transition: color 0.2s;
+  user-select: none;
+}
+.tab.active { color: var(--text); font-weight: 600; }
+.tab.active::after {
+  content: ''; position: absolute; bottom: 0; left: 25%; right: 25%;
+  height: 3px; background: var(--primary2); border-radius: 3px 3px 0 0;
+}
+
+/* Content */
+.content { padding: 12px; }
+.pane { display: none; }
+.pane.active { display: block; animation: fade .25s; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Date divider */
+.date-div {
+  font-size: 12px; color: var(--muted);
+  padding: 12px 4px 6px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.date-div::before, .date-div::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Match Card */
+.match {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px; margin-bottom: 10px;
+}
+.match-head {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 10px;
+}
+.match-no {
+  background: var(--primary); color: white;
+  padding: 3px 9px; border-radius: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+}
+.match-time {
+  font-size: 11px; color: var(--muted);
+  background: var(--card2); padding: 3px 8px; border-radius: 6px;
+}
+.match-teams {
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 6px 0 10px; gap: 8px;
+}
+.match-team {
+  flex: 1; text-align: center;
+  font-size: 14px; font-weight: 600;
+}
+.match-vs { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+/* Odds row */
+.odds-section { margin-top: 6px; }
+.odds-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 1fr 1fr;
+  gap: 6px; margin-bottom: 6px; align-items: center;
+}
+.odds-label {
+  font-size: 10px; color: var(--muted);
+  text-align: center; font-weight: 600;
+  background: var(--card2); padding: 6px 0;
+  border-radius: 6px;
+}
+.odds-btn {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 4px; text-align: center;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.odds-btn:active { transform: scale(0.96); }
+.odds-btn.selected {
+  background: var(--primary); border-color: var(--primary2);
+  box-shadow: 0 0 0 1px var(--primary2);
+}
+.odds-name { font-size: 10px; color: var(--muted); }
+.odds-btn.selected .odds-name { color: rgba(255,255,255,0.85); }
+.odds-val { font-size: 14px; font-weight: 700; margin-top: 2px; font-family: 'SF Mono', 'Menlo', Consolas, monospace; }
+.odds-val.low { color: var(--green); }
+.odds-val.mid { color: var(--yellow); }
+.odds-val.high { color: var(--red); }
+.odds-btn.selected .odds-val { color: white !important; }
+
+/* Support bar */
+.support-block { margin-top: 8px; }
+.support-title { font-size: 10px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+.support {
+  display: flex; height: 10px; border-radius: 5px;
+  overflow: hidden; background: var(--card2);
+}
+.support span { display: block; transition: width 0.4s; position: relative; }
+.support .w { background: linear-gradient(90deg, #3fb950, #2ea043); }
+.support .d { background: linear-gradient(90deg, #d29922, #b8800a); }
+.support .l { background: linear-gradient(90deg, #f85149, #c63d3d); }
+.support-label {
+  display: flex; justify-content: space-between;
+  font-size: 10px; margin-top: 4px;
+  font-family: 'SF Mono', monospace;
+}
+.support-label .w-l { color: var(--green); }
+.support-label .d-l { color: var(--yellow); }
+.support-label .l-l { color: var(--red); }
+
+/* AI Pred Card */
+.ai-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px; margin-bottom: 10px;
+}
+.ai-head {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 8px;
+}
+.ai-teams { font-size: 14px; font-weight: 600; }
+.ai-teams .ai-no {
+  display: inline-block; background: var(--primary);
+  color: white; padding: 2px 7px; border-radius: 4px;
+  font-size: 10px; margin-right: 6px; font-weight: 700;
+}
+.ai-tag {
+  padding: 3px 10px; border-radius: 12px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+}
+.ai-tag.H { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.4); }
+.ai-tag.M { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.4); }
+.ai-tag.L { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.4); }
+
+.ai-picks-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 10px 0 8px;
+}
+.ai-pick-box {
+  background: var(--card2); padding: 8px;
+  border-radius: 8px; border: 1px solid var(--border);
+}
+.ai-pick-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+.ai-pick-val { font-size: 14px; font-weight: 700; color: var(--primary2); }
+.ai-pick-val .small { font-size: 11px; color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+.ai-scores { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 8px; }
+.ai-score {
+  background: var(--card2); padding: 5px 11px;
+  border-radius: 6px; font-size: 12px;
+  font-family: 'SF Mono', monospace; font-weight: 600;
+}
+.ai-score.top {
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  color: white;
+}
+.ai-comment {
+  font-size: 12px; color: var(--muted);
+  line-height: 1.55; margin-top: 8px; padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+/* AI EV 对比 + 影响因素 */
+.ai-pick-box.value {
+  background: linear-gradient(135deg, rgba(212,160,23,0.14), rgba(212,160,23,0.04));
+  border-color: rgba(212,160,23,0.5);
+}
+.ai-pick-box.value .ai-pick-val { color: var(--gold); }
+.ai-pick-box.double {
+  background: linear-gradient(135deg, rgba(63,185,80,0.18), rgba(46,160,67,0.04));
+  border-color: rgba(63,185,80,0.55);
+}
+.ai-pick-box.double .ai-pick-val { color: var(--green); }
+.ev-block {
+  background: var(--card2); border-radius: 8px;
+  padding: 9px 10px; margin: 8px 0;
+  border: 1px solid var(--border);
+}
+.ev-title {
+  font-size: 12px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+}
+.ev-title .small { font-weight: 400; color: var(--muted); font-size: 10px; }
+.ev-row {
+  display: grid;
+  grid-template-columns: 50px 50px 42px 1fr 56px;
+  gap: 6px; align-items: center;
+  padding: 5px 0; font-size: 12px;
+}
+.ev-row + .ev-row { border-top: 1px dashed var(--border); }
+.ev-row.top .ev-name::before { content: '🏆 '; }
+.ev-name { color: var(--text); font-weight: 600; }
+.ev-odd { color: var(--gold); font-weight: 600; font-family: 'SF Mono', monospace; }
+.ev-prob { color: var(--muted); text-align: right; font-size: 11px; }
+.ev-bar {
+  background: var(--bg); border-radius: 3px; height: 7px;
+  overflow: hidden; position: relative;
+}
+.ev-fill { display: block; height: 100%; transition: width 0.3s; }
+.ev-fill.pos { background: linear-gradient(90deg, #3fb950, #2ea043); }
+.ev-fill.mid { background: linear-gradient(90deg, #d29922, #a47312); }
+.ev-fill.neg { background: linear-gradient(90deg, #6e7681, #484f58); }
+.ev-val { font-weight: 700; text-align: right; font-size: 12px; }
+.ev-val.pos { color: var(--green); }
+.ev-val.mid { color: var(--yellow); }
+.ev-val.neg { color: var(--red); }
+
+.factors {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5px; margin: 8px 0 0;
+}
+.factor {
+  padding: 5px 7px; background: rgba(88,166,255,0.08);
+  border-radius: 6px; font-size: 11px; color: var(--text);
+  border-left: 2px solid var(--blue); line-height: 1.4;
+}
+.ai-scores-row {
+  font-size: 12px; margin: 8px 0 0; color: var(--muted);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.ai-scores-row b { color: var(--text); font-size: 11px; }
+
+/* Combo cards */
+.combo-section-title {
+  font-size: 13px; color: var(--text);
+  margin: 16px 4px 10px; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+}
+.combo-section-title .small {
+  font-size: 10px; color: var(--muted);
+  font-weight: 400;
+}
+
+.combo-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px; margin-bottom: 12px;
+  position: relative; overflow: hidden;
+}
+.combo-card.safe { border-color: rgba(63,185,80,0.5); box-shadow: 0 0 20px rgba(63,185,80,0.1); }
+.combo-card.balance { border-color: rgba(210,153,34,0.5); box-shadow: 0 0 20px rgba(210,153,34,0.1); }
+.combo-card.bold { border-color: rgba(248,81,73,0.5); box-shadow: 0 0 20px rgba(248,81,73,0.1); }
+
+.combo-tag {
+  position: absolute; top: 0; right: 0;
+  padding: 5px 14px; border-radius: 0 14px 0 14px;
+  font-size: 10px; font-weight: 700;
+  color: white; letter-spacing: 0.5px;
+}
+.combo-card.safe .combo-tag { background: var(--green); }
+.combo-card.balance .combo-tag { background: var(--yellow); color: #1a1a1a; }
+.combo-card.bold .combo-tag { background: var(--red); }
+
+.combo-title {
+  font-size: 17px; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 4px;
+}
+.combo-sub { font-size: 11px; color: var(--muted); }
+
+.combo-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 12px 0;
+}
+.combo-stat {
+  background: rgba(0,0,0,0.35); padding: 9px;
+  border-radius: 8px;
+}
+.combo-stat-label { font-size: 10px; color: var(--muted); }
+.combo-stat-val {
+  font-size: 17px; font-weight: 700; margin-top: 2px;
+  font-family: 'SF Mono', monospace;
+}
+.combo-stat-val.gold { color: var(--gold); }
+.combo-stat-val.green { color: var(--green); }
+.combo-stat-val.red { color: var(--red); }
+.combo-stat-val.blue { color: var(--blue); }
+.combo-stat-val .unit { font-size: 11px; color: var(--muted); margin-left: 2px; font-weight: 400; }
+
+.combo-bars { margin: 8px 0; }
+.combo-bar {
+  display: flex; align-items: center;
+  gap: 8px; margin: 6px 0;
+}
+.combo-bar-label { font-size: 11px; width: 64px; color: var(--muted); }
+.combo-bar-track {
+  flex: 1; height: 8px; background: var(--card2);
+  border-radius: 4px; overflow: hidden;
+}
+.combo-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s; }
+.combo-bar-fill.recommend { background: linear-gradient(90deg, var(--green), var(--primary2)); }
+.combo-bar-fill.attract { background: linear-gradient(90deg, var(--gold), #ffd34d); }
+.combo-bar-val {
+  font-size: 11px; width: 40px; text-align: right;
+  font-family: 'SF Mono', monospace; font-weight: 600;
+}
+
+.combo-picks {
+  font-size: 11px; color: var(--muted);
+  padding-top: 8px; border-top: 1px dashed var(--border);
+  margin-top: 8px; line-height: 1.7;
+}
+.combo-picks .pick-item {
+  display: inline-block;
+  background: rgba(46,160,67,0.15);
+  border: 1px solid rgba(46,160,67,0.3);
+  color: var(--text); padding: 3px 8px;
+  border-radius: 6px; margin: 2px 4px 2px 0;
+  font-size: 11px;
+}
+
+/* Adopt button */
+.combo-adopt {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-top: 10px; padding: 11px 0;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);
+  color: white; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  width: 100%; transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(46,160,67,0.3);
+  letter-spacing: 0.5px;
+}
+.combo-adopt:active { transform: scale(0.97); box-shadow: 0 1px 4px rgba(46,160,67,0.2); }
+.combo-adopt.adopted {
+  background: linear-gradient(135deg, #555 0%, #444 100%);
+  box-shadow: none; pointer-events: none;
+}
+.combo-card.balance .combo-adopt {
+  background: linear-gradient(135deg, var(--gold) 0%, #b8800a 100%);
+  box-shadow: 0 2px 8px rgba(212,160,23,0.3); color: #1a1a1a;
+}
+.combo-card.bold .combo-adopt {
+  background: linear-gradient(135deg, var(--red) 0%, #c63d3d 100%);
+  box-shadow: 0 2px 8px rgba(248,81,73,0.3);
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(46,160,67,0.95); color: white;
+  padding: 12px 22px; border-radius: 24px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  z-index: 9999; opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  max-width: 90%; text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* Builder */
+.builder {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px; margin-top: 16px;
+}
+.builder-head {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 10px;
+}
+.builder-title {
+  font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+}
+.builder-reset {
+  background: var(--card2); border: 1px solid var(--border);
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 11px; color: var(--muted); cursor: pointer;
+}
+.builder-reset:active { background: var(--border); }
+
+.builder-row {
+  display: grid;
+  grid-template-columns: 42px 1fr 110px;
+  gap: 8px; padding: 9px 0;
+  border-bottom: 1px dashed var(--border);
+  align-items: center;
+}
+.builder-row:last-child { border-bottom: none; }
+.builder-row.picked { background: rgba(46,160,67,0.06); margin: 0 -8px; padding: 9px 8px; border-radius: 4px; }
+.builder-no {
+  background: var(--primary); color: white;
+  padding: 3px 0; border-radius: 4px;
+  font-size: 10px; font-weight: 700; text-align: center;
+}
+.builder-team {
+  font-size: 12px; line-height: 1.3;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.builder-team .small {
+  font-size: 10px; color: var(--muted);
+}
+.builder-select {
+  background: var(--card2); border: 1px solid var(--border);
+  color: var(--text); padding: 7px 6px;
+  border-radius: 6px; font-size: 12px;
+  width: 100%; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='%238b949e'%3E%3Cpath d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 22px;
+}
+.builder-select.has-value { background-color: rgba(46,160,67,0.2); border-color: var(--primary2); }
+.builder-select:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Play Selector */
+.play-bar {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 10px;
+  margin-bottom: 12px;
+}
+.play-bar-title {
+  font-size: 13px; font-weight: 700; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.play-bar-title .small { font-size: 10px; color: var(--muted); font-weight: 400; }
+.play-step { margin-bottom: 8px; }
+.play-step:last-child { margin-bottom: 0; }
+.play-step-label {
+  font-size: 11px; color: var(--muted); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.play-step-label .step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--primary2); color: #fff;
+  font-size: 10px; font-weight: 700;
+}
+.play-chips {
+  display: flex; gap: 6px; overflow-x: auto;
+  padding: 2px 2px 4px; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.play-chips::-webkit-scrollbar { display: none; }
+.play-chip {
+  flex-shrink: 0; padding: 7px 12px; min-width: 50px;
+  background: var(--card2); border: 1.5px solid var(--border);
+  border-radius: 18px; font-size: 12px; color: var(--muted);
+  cursor: pointer; transition: all 0.18s; text-align: center;
+  position: relative; user-select: none;
+}
+.play-chip.hot::after {
+  content: '🔥'; position: absolute; top: -6px; right: -2px; font-size: 11px;
+}
+.play-chip.recommend::after {
+  content: '⭐'; position: absolute; top: -6px; right: -2px; font-size: 11px;
+}
+.play-chip.active {
+  background: var(--primary); color: #fff; border-color: var(--primary2);
+  font-weight: 700; box-shadow: 0 2px 8px rgba(46,160,67,0.4);
+}
+.play-chip:active { transform: scale(0.95); }
+.play-bar-hint {
+  font-size: 11px; color: var(--muted); margin-top: 8px;
+  padding: 7px 9px; background: rgba(46,160,67,0.08);
+  border-radius: 6px; border-left: 2px solid var(--primary2);
+  line-height: 1.6;
+}
+.play-bar-hint b { color: var(--green); }
+.play-bar-hint .badge {
+  display: inline-block; padding: 1px 6px; margin: 0 3px;
+  background: rgba(212,160,23,0.18); color: var(--gold);
+  border-radius: 4px; font-size: 10px; font-weight: 600;
+}
+
+/* Builder progress */
+.builder-progress {
+  font-size: 12px; color: var(--muted); margin: 8px 0 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.builder-progress b { color: var(--text); }
+.builder-progress.full b { color: var(--green); }
+.builder-progress.over b { color: var(--red); }
+
+/* Summary */
+.summary {
+  background: linear-gradient(135deg, #0e7c47 0%, #1a4d33 100%);
+  border-radius: 14px; padding: 14px;
+  margin-top: 14px; color: white;
+}
+.summary-title {
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.summary-item {
+  background: rgba(0,0,0,0.3); padding: 10px;
+  border-radius: 10px;
+}
+.summary-label { font-size: 10px; opacity: 0.8; }
+.summary-val {
+  font-size: 19px; font-weight: 700;
+  margin-top: 4px; font-family: 'SF Mono', monospace;
+}
+.summary-val .unit { font-size: 11px; opacity: 0.7; margin-left: 2px; }
+.summary-input {
+  display: flex; align-items: center;
+  gap: 8px; margin-top: 12px;
+  padding: 8px 10px; background: rgba(0,0,0,0.25);
+  border-radius: 8px;
+}
+.summary-input label { font-size: 12px; opacity: 0.9; }
+.summary-input input {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white; padding: 6px 10px;
+  border-radius: 6px; width: 90px;
+  font-size: 14px; font-weight: 600;
+  text-align: center;
+  font-family: 'SF Mono', monospace;
+}
+.summary-input input:focus { outline: none; border-color: white; }
+
+.summary-recommend {
+  margin-top: 10px; padding: 10px;
+  background: rgba(0,0,0,0.25); border-radius: 8px;
+  font-size: 12px; line-height: 1.6;
+}
+.summary-recommend b { color: #ffd34d; }
+
+/* Risk tip */
+.risk-tip {
+  margin: 16px 4px 4px; padding: 12px;
+  background: rgba(248,81,73,0.08);
+  border: 1px solid rgba(248,81,73,0.25);
+  border-radius: 10px;
+  font-size: 11px; color: var(--muted);
+  line-height: 1.6;
+}
+.risk-tip b { color: var(--red); }
+
+/* Footer */
+.footer {
+  margin: 20px 4px 0; padding: 14px;
+  text-align: center;
+  font-size: 10px; color: var(--muted);
+  line-height: 1.6;
+}
+.footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>⚽ 世界杯智能投注助手</h1>
+  <div class="sub">2026 美加墨世界杯 · 1/16 决赛 · AI 综合预测</div>
+  <div class="meta">数据来源：中国体彩官网 · 更新时间：2026-06-30 20:39</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="match">📊 场次赔率</div>
+  <div class="tab" data-tab="ai">🤖 AI 预测</div>
+  <div class="tab" data-tab="combo">🎰 组合推荐</div>
+</div>
+
+<div class="content">
+  <div id="pane-match" class="pane active"></div>
+  <div id="pane-ai" class="pane"></div>
+  <div id="pane-combo" class="pane"></div>
+</div>
+
+<script>
+/* =================== 数据 =================== */
+const MATCHES = [
+  {
+    no: '077', date: '2026-07-01', day: '周二', time: '01:00',
+    home: '科特迪瓦', away: '挪威',
+    odds: { w: 3.60, d: 3.38, l: 1.80 },
+    hcp: { line: '+1', w: 1.78, d: 3.45, l: 3.60 },
+    support: { w: 18, d: 27, l: 55 },
+    ai: {
+      pick: 'l', pickName: '客胜', confidence: 'M',
+      scores: ['0-1', '1-2', '0-2'],
+      comment: '挪威整体实力占优，哈兰德锋线威胁巨大。科特迪瓦虽有非洲杯冠军底蕴，但欧洲列强面前空间被压缩。客胜支持率高达 55%，赔率 1.80 偏低但合理。'
+    }
+  },
+  {
+    no: '078', date: '2026-07-01', day: '周二', time: '05:00',
+    home: '法国', away: '瑞典',
+    odds: { w: 1.16, d: 5.80, l: 10.50 },
+    hcp: { line: '-1', w: 1.60, d: 3.95, l: 3.98 },
+    support: { w: 76, d: 15, l: 9 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'H',
+      scores: ['2-0', '2-1', '3-0'],
+      comment: '法国 FIFA 排名第一，姆巴佩、登贝莱、库曼等锋线火力全开。瑞典近年新老交替乏力，伊布退役后锋无力。让一球主胜赔率 1.60 是稳健首选。'
+    }
+  },
+  {
+    no: '079', date: '2026-07-01', day: '周二', time: '09:00',
+    home: '墨西哥', away: '厄瓜多尔',
+    odds: { w: 2.02, d: 2.60, l: 4.00 },
+    hcp: { line: '-1', w: 5.15, d: 3.15, l: 1.62 },
+    support: { w: 45, d: 38, l: 17 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'M',
+      scores: ['1-0', '2-1', '1-1'],
+      comment: '东道主之一墨西哥坐拥主场之利+巨大人气加成，洛萨诺、希门尼斯等核心齐整。厄瓜多尔防守稳健但锋无力。看好墨西哥小胜但有平局风险。'
+    }
+  },
+  {
+    no: '080', date: '2026-07-02', day: '周三', time: '00:00',
+    home: '英格兰', away: '刚果(金)',
+    odds: { w: 1.16, d: 5.35, l: 12.50 },
+    hcp: { line: '-1', w: 1.65, d: 3.65, l: 4.01 },
+    support: { w: 75, d: 17, l: 8 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'H',
+      scores: ['3-0', '2-0', '2-1'],
+      comment: '英格兰阵容堪称豪华：贝林厄姆+凯恩+萨卡+福登。刚果金是非洲黑马但首次世界杯淘汰赛经验不足。主胜+大球是最稳逻辑，让一球主胜也建议跟进。'
+    }
+  },
+  {
+    no: '081', date: '2026-07-02', day: '周三', time: '04:00',
+    home: '比利时', away: '塞内加尔',
+    odds: { w: 1.99, d: 2.95, l: 3.47 },
+    hcp: { line: '-1', w: 4.15, d: 3.60, l: 1.64 },
+    support: { w: 49, d: 31, l: 20 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'L',
+      scores: ['2-1', '1-1', '1-0'],
+      comment: '比利时黄金一代收官战，德布劳内+卢卡库经验丰富但状态参差。塞内加尔有马内、库利巴利，体能优势明显。这场是本期最难判断的一场，建议主胜+平双选保险。'
+    }
+  },
+  {
+    no: '082', date: '2026-07-02', day: '周三', time: '08:00',
+    home: '美国', away: '波黑',
+    odds: { w: 1.26, d: 4.55, l: 8.60 },
+    hcp: { line: '-1', w: 1.90, d: 3.50, l: 3.15 },
+    support: { w: 78, d: 15, l: 7 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'H',
+      scores: ['2-0', '2-1', '3-1'],
+      comment: '东道主美国主场作战，普利西奇、雷纳、亚当斯等核心齐整且联赛状态正佳。波黑核心日泽科退役后阵容老化。美国主胜是本期最稳赌注之一。'
+    }
+  },
+  {
+    no: '083', date: '2026-07-03', day: '周四', time: '03:00',
+    home: '西班牙', away: '奥地利',
+    odds: { w: 1.26, d: 4.50, l: 8.80 },
+    hcp: { line: '-1', w: 1.95, d: 3.50, l: 3.02 },
+    support: { w: 75, d: 18, l: 7 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'H',
+      scores: ['2-0', '2-1', '3-0'],
+      comment: '西班牙踢得风生水起：亚马尔+佩德里+罗德里中前场组合冠绝欧洲。奥地利欧洲杯虽有阿瑙托维奇但整体实力差距明显。西班牙主胜稳，让一球可以小搏。'
+    }
+  },
+  {
+    no: '084', date: '2026-07-03', day: '周四', time: '07:00',
+    home: '葡萄牙', away: '克罗地亚',
+    odds: { w: 1.59, d: 3.40, l: 4.85 },
+    hcp: { line: '-1', w: 2.99, d: 3.25, l: 2.05 },
+    support: { w: 50, d: 33, l: 17 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'M',
+      scores: ['2-1', '1-1', '1-0'],
+      comment: 'C罗末舞战 + B 费当家，葡萄牙锋线充沛但防守隐患。克罗地亚老将莫德里奇控场能力依旧，但锋线乏力。葡萄牙小胜或平局可能性都不低，主胜赔率 1.59 偏低。'
+    }
+  },
+  {
+    no: '085', date: '2026-07-03', day: '周四', time: '11:00',
+    home: '瑞士', away: '阿尔及利亚',
+    odds: { w: 1.85, d: 3.00, l: 3.92 },
+    hcp: { line: '-1', w: 3.90, d: 3.35, l: 1.74 },
+    support: { w: 62, d: 29, l: 9 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'M',
+      scores: ['2-1', '1-0', '2-0'],
+      comment: '瑞士欧洲杯进 8 强延续强势，扎卡+沙奇里经验+索默门将稳固。阿尔及利亚非洲杯虽夺冠但缺乏欧洲列强对抗经验。主胜赔率 1.85 是性价比之选。'
+    }
+  }
+];
+
+/* 玩法配置（按场数分组，每个场数下列出所有官方串关玩法）*/
+/* 复式 X串Y 含义：选 N 场，组合成 Y 注小串关；最少命中 minHit 场即可中部分注 */
+const PLAY_GROUPS = {
+  2: [
+    { k: '2串1', notes: 1,  minHit: 2, full: true, tag: 'recommend' }
+  ],
+  3: [
+    { k: '3串1', notes: 1,  minHit: 3, full: true, tag: 'recommend' },
+    { k: '3串3', notes: 3,  minHit: 2 },
+    { k: '3串4', notes: 4,  minHit: 2 }
+  ],
+  4: [
+    { k: '4串1', notes: 1,  minHit: 4, full: true, tag: 'recommend' },
+    { k: '4串4', notes: 4,  minHit: 3 },
+    { k: '4串5', notes: 5,  minHit: 3 },
+    { k: '4串6', notes: 6,  minHit: 2 },
+    { k: '4串11', notes: 11, minHit: 2 }
+  ],
+  5: [
+    { k: '5串1', notes: 1,  minHit: 5, full: true },
+    { k: '5串5', notes: 5,  minHit: 4 },
+    { k: '5串6', notes: 6,  minHit: 4 },
+    { k: '5串10', notes: 10, minHit: 3 },
+    { k: '5串16', notes: 16, minHit: 3 },
+    { k: '5串20', notes: 20, minHit: 2 },
+    { k: '5串26', notes: 26, minHit: 2 }
+  ],
+  6: [
+    { k: '6串1', notes: 1,  minHit: 6, full: true, tag: 'recommend' },
+    { k: '6串6', notes: 6,  minHit: 5 },
+    { k: '6串15', notes: 15, minHit: 4 },
+    { k: '6串20', notes: 20, minHit: 4 },
+    { k: '6串22', notes: 22, minHit: 4, tag: 'hot' },
+    { k: '6串35', notes: 35, minHit: 3 },
+    { k: '6串42', notes: 42, minHit: 3 },
+    { k: '6串50', notes: 50, minHit: 3 },
+    { k: '6串56', notes: 56, minHit: 2 },
+    { k: '6串57', notes: 57, minHit: 2 }
+  ],
+  7: [
+    { k: '7串1', notes: 1,   minHit: 7, full: true },
+    { k: '7串7', notes: 7,   minHit: 6 },
+    { k: '7串21', notes: 21, minHit: 5 },
+    { k: '7串35', notes: 35, minHit: 4 },
+    { k: '7串120', notes: 120, minHit: 2 }
+  ],
+  8: [
+    { k: '8串1', notes: 1,   minHit: 8, full: true },
+    { k: '8串8', notes: 8,   minHit: 7 },
+    { k: '8串28', notes: 28, minHit: 6 },
+    { k: '8串56', notes: 56, minHit: 5 },
+    { k: '8串70', notes: 70, minHit: 4 },
+    { k: '8串247', notes: 247, minHit: 2 }
+  ]
+};
+/* 场数级别标签：⭐ 推荐 / 🔥 热门 */
+const N_TAGS = { 4: 'recommend', 6: 'hot' };
+const N_LIST = [2, 3, 4, 5, 6, 7, 8];
+
+let currentN = 4;            // 当前场数
+let currentType = '4串1';    // 当前串法
+
+function getCurrentPlay() {
+  const list = PLAY_GROUPS[currentN] || [];
+  return list.find(p => p.k === currentType) || list[0];
+}
+
+/* 每场的 AI 策略选择（safe=稳健保守 / bold=激进让球）*/
+const STRATEGY = {
+  '078': { safe: 'w',  safeConf: 0.85, bold: 'hw' },  // 法国
+  '080': { safe: 'w',  safeConf: 0.85, bold: 'hw' },  // 英格兰
+  '082': { safe: 'w',  safeConf: 0.80, bold: 'hw' },  // 美国
+  '083': { safe: 'w',  safeConf: 0.80, bold: 'hw' },  // 西班牙
+  '085': { safe: 'w',  safeConf: 0.60, bold: 'hw' },  // 瑞士
+  '084': { safe: 'w',  safeConf: 0.55, bold: 'hw' },  // 葡萄牙
+  '077': { safe: 'l',  safeConf: 0.55, bold: 'hl' },  // 科特迪瓦客胜
+  '079': { safe: 'w',  safeConf: 0.50, bold: 'hw' },  // 墨西哥
+  '081': { safe: 'w',  safeConf: 0.45, bold: 'l'  }   // 比利时（最不稳，激进反向）
+};
+
+/* 工具：根据 pick key 取赔率和名称 */
+function getOdd(m, key) {
+  if (key === 'w') return m.odds.w;
+  if (key === 'd') return m.odds.d;
+  if (key === 'l') return m.odds.l;
+  if (key === 'hw') return m.hcp.w;
+  if (key === 'hd') return m.hcp.d;
+  if (key === 'hl') return m.hcp.l;
+  return 1;
+}
+function getPickName(m, key) {
+  const map = {
+    'w':  `${m.home} 主胜`,
+    'd':  `${m.home} VS ${m.away} 平局`,
+    'l':  `${m.away} 客胜`,
+    'hw': `${m.home} 让${m.hcp.line} 胜`,
+    'hd': `${m.home} 让${m.hcp.line} 平`,
+    'hl': `${m.home} 让${m.hcp.line} 负`
+  };
+  return map[key] || '';
+}
+function getProb(no, key) {
+  const conf = AI_CONFIDENCE[no];
+  if (!conf) return 0.33;
+  const baseKey = (key === 'hw') ? 'w' : (key === 'hd') ? 'd' : (key === 'hl') ? 'l' : key;
+  return conf[baseKey] || 0.33;
+}
+
+/* 按 safeConf 倒序的场次列表 */
+const SORTED_MATCHES = Object.keys(STRATEGY)
+  .sort((a, b) => STRATEGY[b].safeConf - STRATEGY[a].safeConf);
+
+/* 根据当前玩法（N）动态生成三档推荐 */
+function generateCombos(n) {
+  const safePicks = SORTED_MATCHES.slice(0, n).map(no => ({ no, pick: STRATEGY[no].safe }));
+  // 平衡型：保留高置信度的稳定胆，但末尾换 1 场为下一档置信度（拉高赔率）
+  let balancePicks;
+  if (n >= 2 && n < SORTED_MATCHES.length) {
+    balancePicks = [
+      ...SORTED_MATCHES.slice(0, n - 1).map(no => ({ no, pick: STRATEGY[no].safe })),
+      { no: SORTED_MATCHES[n], pick: STRATEGY[SORTED_MATCHES[n]].safe }
+    ];
+  } else {
+    balancePicks = safePicks;
+  }
+  // 激进型：高置信场用 bold（让球放大），低置信场保留 safe
+  const boldPicks = SORTED_MATCHES.slice(0, n).map(no => {
+    const s = STRATEGY[no];
+    const useBold = s.safeConf >= 0.55;
+    return { no, pick: useBold ? s.bold : s.safe };
+  });
+
+  const buildCombo = (type, title, sub, picks) => {
+    const detailed = picks.map(p => {
+      const m = MATCHES.find(x => x.no === p.no);
+      return { ...p, odd: getOdd(m, p.pick), name: getPickName(m, p.pick), prob: getProb(p.no, p.pick) };
+    });
+    const totalOdd = detailed.reduce((a, p) => a * p.odd, 1);
+    const hitProb  = detailed.reduce((a, p) => a * p.prob, 1);
+    const ev = hitProb * totalOdd - 1;
+    // 推荐指数：综合命中率和 EV 加权（满分 100）
+    const recommend = Math.max(20, Math.min(98, Math.round(hitProb * 100 + 30)));
+    // 吸引指数：组合赔率越高越吸引
+    const attract = Math.max(15, Math.min(99, Math.round(Math.log2(totalOdd + 1) * 22)));
+    return { type, title, sub, picks: detailed, totalOdd, hitProb, ev, recommend, attract };
+  };
+
+  return [
+    buildCombo('safe',    '🛡️ 稳健型', `${n} 场高信心主胆 · ${n}串1`, safePicks),
+    buildCombo('balance', '🎯 平衡型', `${n} 场混合配比 · ${n}串1`, balancePicks),
+    buildCombo('bold',    '🔥 激进型', `${n} 场让球放大 · ${n}串1`, boldPicks)
+  ];
+}
+
+/* 用户预测置信度映射（用于自定义计算）*/
+const AI_CONFIDENCE = {
+  '077': { l: 0.55, w: 0.18, d: 0.27 },
+  '078': { w: 0.85, d: 0.10, l: 0.05 },
+  '079': { w: 0.50, d: 0.30, l: 0.20 },
+  '080': { w: 0.85, d: 0.10, l: 0.05 },
+  '081': { w: 0.40, d: 0.28, l: 0.32 },
+  '082': { w: 0.80, d: 0.13, l: 0.07 },
+  '083': { w: 0.80, d: 0.14, l: 0.06 },
+  '084': { w: 0.55, d: 0.28, l: 0.17 },
+  '085': { w: 0.60, d: 0.25, l: 0.15 }
+};
+
+/* 每场关键影响因素（天气 / 球队状态 / 伤病停赛 / 历史交锋）*/
+const FACTORS = {
+  '077': {
+    weather: '☁️ 多云 19℃ 微风',
+    form:    '📈 挪威近5战4胜 哈兰德7球',
+    injury:  '✅ 双方主力齐整',
+    h2h:     '🤝 近5次挪威3胜2平'
+  },
+  '078': {
+    weather: '☀️ 晴 24℃ 适宜',
+    form:    '🔥 法国近6战不败 锋线火力全开',
+    injury:  '⚠️ 瑞典伊萨克因伤缺阵',
+    h2h:     '👑 近5次法国4胜1平'
+  },
+  '079': {
+    weather: '🌦️ 阵雨 21℃',
+    form:    '📈 墨西哥主场近10战8胜',
+    injury:  '⚠️ 厄瓜多尔主门停赛',
+    h2h:     '🤝 近交锋墨西哥3胜1平1负'
+  },
+  '080': {
+    weather: '☁️ 多云 17℃',
+    form:    '🔥 英格兰近5战全胜',
+    injury:  '✅ 凯恩+贝林厄姆齐整',
+    h2h:     '👑 历史交锋英格兰5胜0负'
+  },
+  '081': {
+    weather: '☀️ 晴 26℃ 偏热',
+    form:    '⚠️ 比利时近4战仅1胜状态低迷',
+    injury:  '🏥 库尔图瓦上场待定',
+    h2h:     '🤝 近5次2胜2平1负胶着'
+  },
+  '082': {
+    weather: '☀️ 晴 22℃ 完美',
+    form:    '🔥 美国本土赛事8连胜',
+    injury:  '✅ 普利西奇+雷纳健康',
+    h2h:     '👑 美国近3次2胜1平'
+  },
+  '083': {
+    weather: '☀️ 晴 25℃',
+    form:    '🔥 西班牙欧洲杯卫冕状态延续',
+    injury:  '✅ 亚马尔+佩德里+罗德里齐整',
+    h2h:     '👑 历史西班牙7胜2平绝对优势'
+  },
+  '084': {
+    weather: '☁️ 阴 19℃',
+    form:    '📊 葡萄牙小组赛2胜1平',
+    injury:  '⚠️ B费体能存疑 C罗替补',
+    h2h:     '🤝 近5次3胜2平互不相让'
+  },
+  '085': {
+    weather: '☀️ 晴 23℃ 适宜',
+    form:    '📈 瑞士欧洲杯8强延续强势',
+    injury:  '✅ 扎卡+沙奇里+索默健康',
+    h2h:     '🆕 历史首次正式交锋'
+  }
+};
+
+/* 算每场胜平负三个选项的概率/赔率/EV，并按 EV 排序 */
+function calcEVOptions(m) {
+  const conf = AI_CONFIDENCE[m.no] || { w: 0.33, d: 0.33, l: 0.33 };
+  const opts = [
+    { key: 'w', short: '主胜', name: m.home + ' 主胜', odd: m.odds.w, prob: conf.w },
+    { key: 'd', short: '平局', name: '平局',          odd: m.odds.d, prob: conf.d },
+    { key: 'l', short: '客胜', name: m.away + ' 客胜', odd: m.odds.l, prob: conf.l }
+  ];
+  opts.forEach(o => { o.ev = o.prob * o.odd - 1; });
+  return opts;
+}
+
+/* =================== 渲染 =================== */
+function clsByOdd(v) {
+  if (v <= 1.5) return 'low';
+  if (v <= 2.5) return 'mid';
+  return 'high';
+}
+
+const userPicks = {};   // matchNo -> 'w'/'d'/'l'/'hw'/'hd'/'hl'
+const builderPicks = {};  // 自定义组合
+
+/* Tab1 渲染 */
+function renderMatch() {
+  const root = document.getElementById('pane-match');
+  let html = '';
+  let lastDate = '';
+  MATCHES.forEach(m => {
+    if (m.date !== lastDate) {
+      html += `<div class="date-div">${m.day} ${m.date}</div>`;
+      lastDate = m.date;
+    }
+    html += `
+    <div class="match">
+      <div class="match-head">
+        <span class="match-no">第 ${m.no} 场</span>
+        <span class="match-time">${m.day} ${m.time}</span>
+      </div>
+      <div class="match-teams">
+        <span class="match-team">${m.home}</span>
+        <span class="match-vs">VS</span>
+        <span class="match-team">${m.away}</span>
+      </div>
+      <div class="odds-section">
+        <div class="odds-row">
+          <div class="odds-label">胜平负</div>
+          <div class="odds-btn ${userPicks[m.no]==='w'?'selected':''}" onclick="togglePick('${m.no}','w')">
+            <div class="odds-name">主胜</div>
+            <div class="odds-val ${clsByOdd(m.odds.w)}">${m.odds.w.toFixed(2)}</div>
+          </div>
+          <div class="odds-btn ${userPicks[m.no]==='d'?'selected':''}" onclick="togglePick('${m.no}','d')">
+            <div class="odds-name">平局</div>
+            <div class="odds-val ${clsByOdd(m.odds.d)}">${m.odds.d.toFixed(2)}</div>
+          </div>
+          <div class="odds-btn ${userPicks[m.no]==='l'?'selected':''}" onclick="togglePick('${m.no}','l')">
+            <div class="odds-name">客胜</div>
+            <div class="odds-val ${clsByOdd(m.odds.l)}">${m.odds.l.toFixed(2)}</div>
+          </div>
+        </div>
+        <div class="odds-row">
+          <div class="odds-label">让${m.hcp.line}</div>
+          <div class="odds-btn ${userPicks[m.no]==='hw'?'selected':''}" onclick="togglePick('${m.no}','hw')">
+            <div class="odds-name">让胜</div>
+            <div class="odds-val ${clsByOdd(m.hcp.w)}">${m.hcp.w.toFixed(2)}</div>
+          </div>
+          <div class="odds-btn ${userPicks[m.no]==='hd'?'selected':''}" onclick="togglePick('${m.no}','hd')">
+            <div class="odds-name">让平</div>
+            <div class="odds-val ${clsByOdd(m.hcp.d)}">${m.hcp.d.toFixed(2)}</div>
+          </div>
+          <div class="odds-btn ${userPicks[m.no]==='hl'?'selected':''}" onclick="togglePick('${m.no}','hl')">
+            <div class="odds-name">让负</div>
+            <div class="odds-val ${clsByOdd(m.hcp.l)}">${m.hcp.l.toFixed(2)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="support-block">
+        <div class="support-title">
+          <span>群众支持率</span>
+          <span>胜 / 平 / 负</span>
+        </div>
+        <div class="support">
+          <span class="w" style="width:${m.support.w}%"></span>
+          <span class="d" style="width:${m.support.d}%"></span>
+          <span class="l" style="width:${m.support.l}%"></span>
+        </div>
+        <div class="support-label">
+          <span class="w-l">${m.support.w}%</span>
+          <span class="d-l">${m.support.d}%</span>
+          <span class="l-l">${m.support.l}%</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  root.innerHTML = html;
+}
+
+function togglePick(no, key) {
+  if (userPicks[no] === key) delete userPicks[no];
+  else userPicks[no] = key;
+  renderMatch();
+}
+
+/* Tab2 渲染 */
+function renderAI() {
+  const root = document.getElementById('pane-ai');
+  let html = `<div class="combo-section-title">🤖 AI 综合预测 <span class="small">胜率 + 赔率 + 性价比 EV + 影响因素</span></div>`;
+  MATCHES.forEach(m => {
+    const ai = m.ai;
+    const opts = calcEVOptions(m);
+    const byProb = [...opts].sort((a, b) => b.prob - a.prob);
+    const byEV   = [...opts].sort((a, b) => b.ev - a.ev);
+    const topProb = byProb[0];
+    const topEV   = byEV[0];
+    const sameTop = topProb.key === topEV.key;
+    const fac = FACTORS[m.no] || {};
+
+    // EV 排序条：用 EV 值映射到 0-100% 进度（-30% → 0%, +30% → 100%）
+    const evRows = byEV.map((o, i) => {
+      const cls = o.ev > 0 ? 'pos' : o.ev > -0.08 ? 'mid' : 'neg';
+      const barW = Math.max(4, Math.min(100, Math.round((o.ev + 0.3) / 0.6 * 100)));
+      return `
+        <div class="ev-row ${i===0?'top':''}">
+          <span class="ev-name">${o.short}</span>
+          <span class="ev-odd">@${o.odd.toFixed(2)}</span>
+          <span class="ev-prob">${Math.round(o.prob*100)}%</span>
+          <span class="ev-bar"><span class="ev-fill ${cls}" style="width:${barW}%"></span></span>
+          <span class="ev-val ${cls}">${o.ev>0?'+':''}${(o.ev*100).toFixed(0)}%</span>
+        </div>`;
+    }).join('');
+
+    // 性价比 box：与胜率重合时显示"双优"，分歧时显示价值之选
+    const valueBox = sameTop ? `
+      <div class="ai-pick-box double">
+        <div class="ai-pick-label">⭐ 胜率+性价比双优 · 强推</div>
+        <div class="ai-pick-val">${topProb.name} <span class="small">@${topProb.odd.toFixed(2)} · 胜率 ${Math.round(topProb.prob*100)}% · EV ${topProb.ev>=0?'+':''}${(topProb.ev*100).toFixed(0)}%</span></div>
+      </div>` : `
+      <div class="ai-pick-box">
+        <div class="ai-pick-label">🎯 胜率之选</div>
+        <div class="ai-pick-val">${topProb.name} <span class="small">@${topProb.odd.toFixed(2)} · 胜率 ${Math.round(topProb.prob*100)}%</span></div>
+      </div>
+      <div class="ai-pick-box value">
+        <div class="ai-pick-label">💎 性价比之选 ${topEV.ev>0?'🔥 正期望':'· 值得冲'}</div>
+        <div class="ai-pick-val">${topEV.name} <span class="small">@${topEV.odd.toFixed(2)} · EV ${topEV.ev>=0?'+':''}${(topEV.ev*100).toFixed(0)}%</span></div>
+      </div>`;
+
+    html += `
+    <div class="ai-card">
+      <div class="ai-head">
+        <div class="ai-teams"><span class="ai-no">${m.no}</span>${m.home} VS ${m.away}</div>
+        <span class="ai-tag ${ai.confidence}">${ai.confidence==='H'?'高信心':ai.confidence==='M'?'中信心':'低信心'}</span>
+      </div>
+      <div class="ai-picks-row" style="${sameTop?'grid-template-columns: 1fr;':''}">
+        ${valueBox}
+      </div>
+      <div class="ev-block">
+        <div class="ev-title">📊 胜平负性价比对比 <span class="small">EV = 胜率 × 赔率 − 1，&gt;0 即长期正期望</span></div>
+        ${evRows}
+      </div>
+      <div class="factors">
+        ${fac.weather?`<div class="factor">${fac.weather}</div>`:''}
+        ${fac.form?`<div class="factor">${fac.form}</div>`:''}
+        ${fac.injury?`<div class="factor">${fac.injury}</div>`:''}
+        ${fac.h2h?`<div class="factor">${fac.h2h}</div>`:''}
+      </div>
+      <div class="ai-scores-row">
+        <b>⚽ 推荐比分 TOP3：</b>
+        ${ai.scores.map((s, i) => `<span class="ai-score ${i===0?'top':''}">${s}</span>`).join('')}
+      </div>
+      <div class="ai-comment">💡 ${ai.comment}</div>
+    </div>`;
+  });
+  root.innerHTML = html;
+}
+
+/* Tab3 渲染 */
+function renderCombo() {
+  const root = document.getElementById('pane-combo');
+
+  // 顶部玩法选择条（两步）
+  const play = getCurrentPlay();
+  const typeList = PLAY_GROUPS[currentN] || [];
+  const hintTxt = play.full
+    ? `<b>${play.k}</b>：${currentN} 场<b>全中</b>才算赢 · <span class="badge">${play.notes} 注</span>赔率最高`
+    : `<b>${play.k}</b>：选 ${currentN} 场拆成 <span class="badge">${play.notes} 注</span>小串关 · 最少命中 <b>${play.minHit}</b> 场即可中部分注`;
+  let html = `
+  <div class="play-bar">
+    <div class="play-bar-title">🎰 选择玩法 <span class="small">先选场数 → 再选串法</span></div>
+    <div class="play-step">
+      <div class="play-step-label"><span class="step-num">1</span>选场数</div>
+      <div class="play-chips">
+        ${N_LIST.map(n => `
+          <div class="play-chip ${n === currentN ? 'active' : ''} ${N_TAGS[n] || ''}"
+               onclick="setN(${n})">${n}场</div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="play-step">
+      <div class="play-step-label"><span class="step-num">2</span>选串法</div>
+      <div class="play-chips">
+        ${typeList.map(t => `
+          <div class="play-chip ${t.k === currentType ? 'active' : ''} ${t.tag || ''}"
+               onclick="setType('${t.k}')">${t.k}</div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="play-bar-hint">${hintTxt}</div>
+  </div>
+  `;
+
+  html += `<div class="combo-section-title">🎰 AI 推荐组合 <span class="small">三档风险任选 · 基于当前玩法</span></div>`;
+
+  const combos = generateCombos(currentN);
+  combos.forEach(c => {
+    const totalOdd = c.totalOdd;
+    const profit = totalOdd * 100 - 100;
+    html += `
+    <div class="combo-card ${c.type}">
+      <div class="combo-tag">${c.type==='safe'?'低风险':c.type==='balance'?'中风险':'高风险'}</div>
+      <div class="combo-title">${c.title}</div>
+      <div class="combo-sub">${c.sub}</div>
+      <div class="combo-stats">
+        <div class="combo-stat">
+          <div class="combo-stat-label">💰 组合总赔率</div>
+          <div class="combo-stat-val gold">${totalOdd.toFixed(2)}<span class="unit">倍</span></div>
+        </div>
+        <div class="combo-stat">
+          <div class="combo-stat-label">🎲 联合命中率</div>
+          <div class="combo-stat-val ${c.hitProb>0.3?'green':c.hitProb>0.1?'blue':'red'}">${(c.hitProb*100).toFixed(1)}<span class="unit">%</span></div>
+        </div>
+        <div class="combo-stat">
+          <div class="combo-stat-label">📈 投 100 元预期</div>
+          <div class="combo-stat-val ${c.type==='safe'?'green':c.type==='balance'?'gold':'red'}">+${profit.toFixed(0)}<span class="unit">元</span></div>
+        </div>
+        <div class="combo-stat">
+          <div class="combo-stat-label">🎯 EV 期望值</div>
+          <div class="combo-stat-val ${c.hitProb*totalOdd>1?'green':'red'}">${((c.hitProb*totalOdd-1)*100).toFixed(0)}<span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="combo-bars">
+        <div class="combo-bar">
+          <span class="combo-bar-label">📊 推荐指数</span>
+          <div class="combo-bar-track"><div class="combo-bar-fill recommend" style="width:${c.recommend}%"></div></div>
+          <span class="combo-bar-val">${c.recommend}%</span>
+        </div>
+        <div class="combo-bar">
+          <span class="combo-bar-label">✨ 吸引指数</span>
+          <div class="combo-bar-track"><div class="combo-bar-fill attract" style="width:${c.attract}%"></div></div>
+          <span class="combo-bar-val">${c.attract}%</span>
+        </div>
+      </div>
+      <div class="combo-picks">
+        <b>包含场次（${c.picks.length}）：</b><br>
+        ${c.picks.map(p => `<span class="pick-item">${p.no} · ${p.name} @${p.odd.toFixed(2)}</span>`).join('')}
+      </div>
+      <button class="combo-adopt" onclick="adoptCombo('${c.type}')">⚡ 一键采纳到我的组合</button>
+    </div>`;
+  });
+
+  // 自定义组合器
+  html += `
+  <div class="builder">
+    <div class="builder-head">
+      <div class="builder-title">🛠️ 自定义组合</div>
+      <div class="builder-reset" onclick="resetBuilder()">重置</div>
+    </div>
+    <div class="play-bar" style="margin: 0 0 10px 0; background: var(--card2);">
+      <div class="play-bar-title" style="font-size: 12px;">🎯 自定义玩法 <span class="small">先选场数 → 再选串法</span></div>
+      <div class="play-step">
+        <div class="play-step-label"><span class="step-num">1</span>选场数</div>
+        <div class="play-chips">
+          ${N_LIST.map(n => `
+            <div class="play-chip ${n === currentN ? 'active' : ''} ${N_TAGS[n] || ''}"
+                 onclick="setN(${n})">${n}场</div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="play-step">
+        <div class="play-step-label"><span class="step-num">2</span>选串法</div>
+        <div class="play-chips">
+          ${(PLAY_GROUPS[currentN] || []).map(t => `
+            <div class="play-chip ${t.k === currentType ? 'active' : ''} ${t.tag || ''}"
+                 onclick="setType('${t.k}')">${t.k}</div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <div id="builder-progress" class="builder-progress"></div>
+    <div id="builder-rows"></div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-title">💼 我的组合实时计算</div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-label">已选场次</div>
+        <div class="summary-val"><span id="sum-count">0</span><span class="unit">场</span></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">总赔率</div>
+        <div class="summary-val"><span id="sum-odd">0.00</span><span class="unit">倍</span></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">命中概率</div>
+        <div class="summary-val"><span id="sum-prob">0.00</span><span class="unit">%</span></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">预期盈利</div>
+        <div class="summary-val">+<span id="sum-profit">0</span><span class="unit">元</span></div>
+      </div>
+    </div>
+    <div class="summary-input">
+      <label>💵 投注金额（元）</label>
+      <input type="number" id="stake" value="100" min="2" step="2" oninput="updateSummary()">
+    </div>
+    <div class="summary-recommend" id="sum-tip">
+      在下方为每场比赛选择预测结果，系统会实时为你计算 <b>总赔率 · 命中概率 · 预期盈利</b>。
+    </div>
+  </div>
+
+  <div class="risk-tip">
+    <b>⚠️ 风险提示：</b>
+    1. 本工具仅供研究娱乐，所有 AI 预测均存在不确定性；<br>
+    2. 串关玩法风险随场次数指数级放大，9 串 1 命中率通常低于 5%；<br>
+    3. 数据来源：中国体彩官网（sporttery.cn），赔率会实时浮动；<br>
+    4. 请理性投注，量力而行，未成年人禁止参与。
+  </div>
+
+  <div class="footer">
+    ⚽ 世界杯智能投注助手 v3.1 · 完整竞彩玩法 · AI 多维评分<br>
+    数据快照：2026-06-30 20:39 · 共 9 场（编号 077-085）
+  </div>
+  `;
+  root.innerHTML = html;
+  renderBuilder();
+  updateSummary();
+}
+
+/* 自定义组合器 */
+function renderBuilder() {
+  const root = document.getElementById('builder-rows');
+  const pickedCount = Object.keys(builderPicks).length;
+  const isFull = pickedCount >= currentN;
+  let html = '';
+  MATCHES.forEach(m => {
+    const v = builderPicks[m.no] || '';
+    const hasV = v !== '';
+    // 已满且本场未选 → 禁用
+    const disabled = isFull && !hasV;
+    html += `
+    <div class="builder-row ${hasV?'picked':''}">
+      <div class="builder-no">${m.no}</div>
+      <div class="builder-team">
+        ${m.home} <span class="small">VS</span> ${m.away}
+        <span class="small">${m.day} ${m.time}</span>
+      </div>
+      <select class="builder-select ${hasV?'has-value':''}" ${disabled?'disabled':''} onchange="setBuilder('${m.no}', this.value)">
+        <option value="" ${v===''?'selected':''}>不选</option>
+        <option value="w" ${v==='w'?'selected':''}>胜 @${m.odds.w}</option>
+        <option value="d" ${v==='d'?'selected':''}>平 @${m.odds.d}</option>
+        <option value="l" ${v==='l'?'selected':''}>负 @${m.odds.l}</option>
+        <option value="hw" ${v==='hw'?'selected':''}>让${m.hcp.line}胜 @${m.hcp.w}</option>
+        <option value="hd" ${v==='hd'?'selected':''}>让${m.hcp.line}平 @${m.hcp.d}</option>
+        <option value="hl" ${v==='hl'?'selected':''}>让${m.hcp.line}负 @${m.hcp.l}</option>
+      </select>
+    </div>`;
+  });
+  root.innerHTML = html;
+
+  // 进度提示（包含当前玩法 X串Y）
+  const prog = document.getElementById('builder-progress');
+  if (prog) {
+    const play = getCurrentPlay();
+    let cls = '', tip = '';
+    if (pickedCount === 0) {
+      tip = `🎯 当前 <b>${play.k}</b>：还需选择 <b>${currentN}</b> 场`;
+    } else if (pickedCount < currentN) {
+      tip = `🎯 当前 <b>${play.k}</b>：已选 <b>${pickedCount}/${currentN}</b> 场，还需 <b>${currentN - pickedCount}</b> 场`;
+    } else if (pickedCount === currentN) {
+      cls = 'full';
+      const extra = play.full ? `全中即赢，共 ${play.notes} 注` : `复式 ${play.notes} 注，最少命中 ${play.minHit} 场`;
+      tip = `✅ 已凑齐 <b>${play.k}</b>：${pickedCount} 场 · ${extra}`;
+    } else {
+      cls = 'over';
+      tip = `⚠️ 已选 <b>${pickedCount}</b> 场，超过当前 ${play.k}，请减少或换更大场数`;
+    }
+    prog.className = `builder-progress ${cls}`;
+    prog.innerHTML = tip;
+  }
+}
+
+function setBuilder(no, val) {
+  if (val === '') {
+    delete builderPicks[no];
+  } else {
+    // 选满则拒绝新增（已存在的可以改）
+    const pickedCount = Object.keys(builderPicks).length;
+    if (pickedCount >= currentN && !(no in builderPicks)) {
+      const play = getCurrentPlay();
+      showToast(`⚠️ 当前是 ${play.k}，已选满 ${currentN} 场`);
+      renderBuilder();
+      return;
+    }
+    builderPicks[no] = val;
+  }
+  renderBuilder();
+  updateSummary();
+}
+
+function resetBuilder() {
+  for (const k in builderPicks) delete builderPicks[k];
+  renderBuilder();
+  updateSummary();
+}
+
+/* 切换场数（重置串法为该场数下第一个）*/
+function setN(n) {
+  if (currentN === n) return;
+  currentN = n;
+  currentType = PLAY_GROUPS[n][0].k;   // 默认选该场数下的 N串1
+  // 若已选场次超过新场数，截断到最高置信度的前 n 场
+  const picked = Object.keys(builderPicks);
+  if (picked.length > n) {
+    const keepSet = new Set(SORTED_MATCHES.filter(no => no in builderPicks).slice(0, n));
+    Object.keys(builderPicks).forEach(no => {
+      if (!keepSet.has(no)) delete builderPicks[no];
+    });
+    showToast(`⚙️ 切换至 ${currentType}，已自动保留前 ${n} 场`);
+  }
+  renderCombo();
+  updateSummary();
+}
+
+/* 切换串法（场数不变）*/
+function setType(typeKey) {
+  if (currentType === typeKey) return;
+  currentType = typeKey;
+  renderCombo();
+  updateSummary();
+}
+
+/* 一键采纳 AI 推荐组合 */
+function adoptCombo(type) {
+  const combos = generateCombos(currentN);
+  const combo = combos.find(c => c.type === type);
+  if (!combo) return;
+  // 清空旧的，填入新的
+  for (const k in builderPicks) delete builderPicks[k];
+  combo.picks.forEach(p => {
+    builderPicks[p.no] = p.pick;
+  });
+  renderBuilder();
+  updateSummary();
+  // toast 提示
+  const cleanTitle = combo.title.replace(/[^\u4e00-\u9fa5A-Za-z]/g, '').trim();
+  const play = getCurrentPlay();
+  showToast(`✅ 已采纳「${cleanTitle}」（${play.k}，${combo.picks.length} 场）`);
+  // 滚动到 builder 位置
+  setTimeout(() => {
+    const builder = document.querySelector('.builder');
+    if (builder) builder.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 200);
+}
+
+/* Toast */
+let toastTimer = null;
+function showToast(msg) {
+  let t = document.getElementById('app-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'app-toast'; t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* 计算汇总 */
+function updateSummary() {
+  const picks = Object.entries(builderPicks);
+  let totalOdd = 1;
+  let totalProb = 1;
+  picks.forEach(([no, key]) => {
+    const m = MATCHES.find(x => x.no === no);
+    if (!m) return;
+    let odd = 1;
+    let baseKey = key;
+    if (key === 'w') odd = m.odds.w;
+    else if (key === 'd') odd = m.odds.d;
+    else if (key === 'l') odd = m.odds.l;
+    else if (key === 'hw') { odd = m.hcp.w; baseKey = 'w'; }
+    else if (key === 'hd') { odd = m.hcp.d; baseKey = 'd'; }
+    else if (key === 'hl') { odd = m.hcp.l; baseKey = 'l'; }
+    totalOdd *= odd;
+    const conf = AI_CONFIDENCE[no];
+    if (conf) totalProb *= conf[baseKey] || 0.33;
+  });
+  if (picks.length === 0) { totalOdd = 0; totalProb = 0; }
+
+  const stake = parseFloat(document.getElementById('stake').value) || 100;
+  const profit = picks.length > 0 ? totalOdd * stake - stake : 0;
+  const ev = picks.length > 0 ? totalProb * totalOdd - 1 : 0;
+
+  document.getElementById('sum-count').textContent = picks.length;
+  document.getElementById('sum-odd').textContent = totalOdd.toFixed(2);
+  document.getElementById('sum-prob').textContent = (totalProb * 100).toFixed(2);
+  document.getElementById('sum-profit').textContent = profit.toFixed(0);
+
+  const tip = document.getElementById('sum-tip');
+  if (picks.length === 0) {
+    tip.innerHTML = '在下方为每场比赛选择预测结果，系统会实时为你计算 <b>总赔率 · 命中概率 · 预期盈利</b>。';
+  } else if (picks.length === 1) {
+    tip.innerHTML = `💡 当前为<b>单关玩法</b>（注意：体彩部分场次不允许单关，需 ≥ 2 场组合）。`;
+  } else {
+    let evColor = ev > 0.2 ? '#ffd34d' : ev > 0 ? '#3fb950' : '#f85149';
+    let recLevel = '';
+    if (totalProb > 0.3) recLevel = '✅ <b>稳健型</b>，命中概率较高';
+    else if (totalProb > 0.1) recLevel = '⚖️ <b>平衡型</b>，风险收益均衡';
+    else recLevel = '⚠️ <b>高风险型</b>，搏冷玩法';
+    tip.innerHTML = `${recLevel}<br>📊 投 ${stake} 元命中可得 <b>${(totalOdd*stake).toFixed(0)}</b> 元，期望值 EV = <span style="color:${evColor}">${(ev*100).toFixed(0)}%</span>（>0 即长期正期望）`;
+  }
+}
+
+/* Tab 切换 */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('pane-' + t.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+renderMatch();
+renderAI();
+renderCombo();
+</script>
+</body>
+</html>
