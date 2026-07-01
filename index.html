@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0e7c47">
-<title>⚽ 世界杯智能投注助手 · AI 预测 v3.1</title>
+<title>⚽ 世界杯智能投注助手 · AI 预测 v3.3</title>
 <style>
 :root {
   --bg: #0d1117;
@@ -310,6 +310,38 @@ body { max-width: 560px; margin: 0 auto; padding-bottom: 80px; min-height: 100vh
 .combo-section-title .small {
   font-size: 10px; color: var(--muted);
   font-weight: 400;
+}
+
+/* v3.3: AI 战绩条 */
+.track-record {
+  background: linear-gradient(135deg, rgba(20,140,80,0.14), rgba(10,80,50,0.06));
+  border: 1px solid rgba(46,204,113,0.34);
+  border-radius: 10px; padding: 12px 12px 10px; margin: 8px 0 4px;
+}
+.track-title {
+  font-size: 12px; font-weight: 700; color: var(--pos);
+  margin-bottom: 8px;
+}
+.track-grid {
+  display: grid; grid-template-columns: 1fr; gap: 6px;
+}
+.track-item {
+  background: rgba(255,255,255,0.03); border-radius: 8px;
+  padding: 7px 9px; border-left: 3px solid var(--pos);
+  font-size: 11px; line-height: 1.5;
+}
+.track-match { color: var(--text); font-weight: 600; }
+.track-pred  { color: var(--muted); }
+.track-pred b { color: var(--warn); }
+.track-result { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.track-badge {
+  display: inline-flex; padding: 1px 6px; border-radius: 10px;
+  font-size: 10px; font-weight: 700;
+}
+.track-badge.ok { background: rgba(46,204,113,0.22); color: var(--pos); }
+.track-summary {
+  margin-top: 8px; font-size: 11px; color: var(--pos); font-weight: 600;
+  text-align: center;
 }
 
 .combo-card {
@@ -647,42 +679,6 @@ body { max-width: 560px; margin: 0 auto; padding-bottom: 80px; min-height: 100vh
 /* =================== 数据 =================== */
 const MATCHES = [
   {
-    no: '077', date: '2026-07-01', day: '周二', time: '01:00',
-    home: '科特迪瓦', away: '挪威',
-    odds: { w: 3.60, d: 3.38, l: 1.80 },
-    hcp: { line: '+1', w: 1.78, d: 3.45, l: 3.60 },
-    support: { w: 18, d: 27, l: 55 },
-    ai: {
-      pick: 'l', pickName: '客胜', confidence: 'M',
-      scores: ['0-1', '1-2', '0-2'],
-      comment: '挪威整体实力占优，哈兰德锋线威胁巨大。科特迪瓦虽有非洲杯冠军底蕴，但欧洲列强面前空间被压缩。客胜支持率高达 55%，赔率 1.80 偏低但合理。'
-    }
-  },
-  {
-    no: '078', date: '2026-07-01', day: '周二', time: '05:00',
-    home: '法国', away: '瑞典',
-    odds: { w: 1.16, d: 5.80, l: 10.50 },
-    hcp: { line: '-1', w: 1.60, d: 3.95, l: 3.98 },
-    support: { w: 76, d: 15, l: 9 },
-    ai: {
-      pick: 'w', pickName: '主胜', confidence: 'H',
-      scores: ['2-0', '2-1', '3-0'],
-      comment: '法国 FIFA 排名第一，姆巴佩、登贝莱、库曼等锋线火力全开。瑞典近年新老交替乏力，伊布退役后锋无力。让一球主胜赔率 1.60 是稳健首选。'
-    }
-  },
-  {
-    no: '079', date: '2026-07-01', day: '周二', time: '09:00',
-    home: '墨西哥', away: '厄瓜多尔',
-    odds: { w: 2.02, d: 2.60, l: 4.00 },
-    hcp: { line: '-1', w: 5.15, d: 3.15, l: 1.62 },
-    support: { w: 45, d: 38, l: 17 },
-    ai: {
-      pick: 'w', pickName: '主胜', confidence: 'M',
-      scores: ['1-0', '2-1', '1-1'],
-      comment: '东道主之一墨西哥坐拥主场之利+巨大人气加成，洛萨诺、希门尼斯等核心齐整。厄瓜多尔防守稳健但锋无力。看好墨西哥小胜但有平局风险。'
-    }
-  },
-  {
     no: '080', date: '2026-07-02', day: '周三', time: '00:00',
     home: '英格兰', away: '刚果(金)',
     odds: { w: 1.16, d: 5.35, l: 12.50 },
@@ -697,9 +693,9 @@ const MATCHES = [
   {
     no: '081', date: '2026-07-02', day: '周三', time: '04:00',
     home: '比利时', away: '塞内加尔',
-    odds: { w: 1.99, d: 2.95, l: 3.47 },
+    odds: { w: 1.96, d: 2.98, l: 3.52 },
     hcp: { line: '-1', w: 4.15, d: 3.60, l: 1.64 },
-    support: { w: 49, d: 31, l: 20 },
+    support: { w: 49, d: 32, l: 19 },
     ai: {
       pick: 'w', pickName: '主胜', confidence: 'L',
       scores: ['2-1', '1-1', '1-0'],
@@ -709,9 +705,9 @@ const MATCHES = [
   {
     no: '082', date: '2026-07-02', day: '周三', time: '08:00',
     home: '美国', away: '波黑',
-    odds: { w: 1.26, d: 4.55, l: 8.60 },
-    hcp: { line: '-1', w: 1.90, d: 3.50, l: 3.15 },
-    support: { w: 78, d: 15, l: 7 },
+    odds: { w: 1.23, d: 4.80, l: 9.25 },
+    hcp: { line: '-1', w: 1.87, d: 3.50, l: 3.24 },
+    support: { w: 78, d: 16, l: 6 },
     ai: {
       pick: 'w', pickName: '主胜', confidence: 'H',
       scores: ['2-0', '2-1', '3-1'],
@@ -721,9 +717,9 @@ const MATCHES = [
   {
     no: '083', date: '2026-07-03', day: '周四', time: '03:00',
     home: '西班牙', away: '奥地利',
-    odds: { w: 1.26, d: 4.50, l: 8.80 },
-    hcp: { line: '-1', w: 1.95, d: 3.50, l: 3.02 },
-    support: { w: 75, d: 18, l: 7 },
+    odds: { w: 1.23, d: 4.75, l: 9.40 },
+    hcp: { line: '-1', w: 1.85, d: 3.55, l: 3.25 },
+    support: { w: 77, d: 16, l: 7 },
     ai: {
       pick: 'w', pickName: '主胜', confidence: 'H',
       scores: ['2-0', '2-1', '3-0'],
@@ -745,13 +741,49 @@ const MATCHES = [
   {
     no: '085', date: '2026-07-03', day: '周四', time: '11:00',
     home: '瑞士', away: '阿尔及利亚',
-    odds: { w: 1.85, d: 3.00, l: 3.92 },
-    hcp: { line: '-1', w: 3.90, d: 3.35, l: 1.74 },
-    support: { w: 62, d: 29, l: 9 },
+    odds: { w: 1.83, d: 3.00, l: 4.00 },
+    hcp: { line: '-1', w: 3.82, d: 3.30, l: 1.77 },
+    support: { w: 64, d: 27, l: 9 },
     ai: {
       pick: 'w', pickName: '主胜', confidence: 'M',
       scores: ['2-1', '1-0', '2-0'],
-      comment: '瑞士欧洲杯进 8 强延续强势，扎卡+沙奇里经验+索默门将稳固。阿尔及利亚非洲杯虽夺冠但缺乏欧洲列强对抗经验。主胜赔率 1.85 是性价比之选。'
+      comment: '瑞士欧洲杯进 8 强延续强势，扎卡+沙奇里经验+索默门将稳固。阿尔及利亚非洲杯虽夺冠但缺乏欧洲列强对抗经验。主胜赔率 1.83 是性价比之选。'
+    }
+  },
+  {
+    no: '086', date: '2026-07-04', day: '周五', time: '02:00',
+    home: '澳大利亚', away: '埃及',
+    odds: { w: 3.40, d: 2.85, l: 2.50 },
+    hcp: { line: '+1', w: 1.72, d: 3.50, l: 3.80 },
+    support: { w: 28, d: 32, l: 40 },
+    ai: {
+      pick: 'l', pickName: '客胜', confidence: 'L',
+      scores: ['0-1', '1-1', '1-2'],
+      comment: '本期最难判断场次之一。埃及有萨拉赫领衔+非洲杯亚军底蕴，客胜赔率 2.50 是三档最低；澳大利亚防守硬朗但攻击力平庸。差距不大，建议冲冷派押埃及 + 稳健派让球+1平局兜底。'
+    }
+  },
+  {
+    no: '087', date: '2026-07-04', day: '周五', time: '06:00',
+    home: '阿根廷', away: '佛得角',
+    odds: { w: 1.14, d: 7.50, l: 20.00 },
+    hcp: { line: '-2', w: 2.11, d: 3.82, l: 2.54 },
+    support: { w: 82, d: 12, l: 6 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'H',
+      scores: ['3-0', '2-0', '4-0'],
+      comment: '梅西领衔的阿根廷小组赛 3 战全胜进 8 球仅丢 1 球，签运最好整个下半区无强敌。佛得角非洲小国首次世界杯淘汰赛，防守韧性可能拖延但难改结局。让 2 球主胜 2.11 是本期最搏的稳胆。'
+    }
+  },
+  {
+    no: '088', date: '2026-07-04', day: '周五', time: '09:30',
+    home: '哥伦比亚', away: '加纳',
+    odds: { w: 1.32, d: 4.00, l: 8.20 },
+    hcp: { line: '-1', w: 2.23, d: 3.15, l: 2.75 },
+    support: { w: 72, d: 18, l: 10 },
+    ai: {
+      pick: 'w', pickName: '主胜', confidence: 'H',
+      scores: ['2-0', '2-1', '3-1'],
+      comment: '哥伦比亚南美劲旅，J罗+迪亚斯+杜兰状态火热，小组赛 2 胜 1 平进 4 球仅丢 1 球。加纳非洲队体能充沛但整体实力略逊。主胜赔率 1.32 稳但收益低，让一球 2.23 可以搏。'
     }
   }
 ];
@@ -825,15 +857,15 @@ function getCurrentPlay() {
 
 /* 每场的 AI 策略选择（safe=稳健保守 / bold=激进让球）*/
 const STRATEGY = {
-  '078': { safe: 'w',  safeConf: 0.85, bold: 'hw' },  // 法国
+  '087': { safe: 'w',  safeConf: 0.88, bold: 'hw' },  // 阿根廷（本期最热）
   '080': { safe: 'w',  safeConf: 0.85, bold: 'hw' },  // 英格兰
   '082': { safe: 'w',  safeConf: 0.80, bold: 'hw' },  // 美国
   '083': { safe: 'w',  safeConf: 0.80, bold: 'hw' },  // 西班牙
+  '088': { safe: 'w',  safeConf: 0.72, bold: 'hw' },  // 哥伦比亚
   '085': { safe: 'w',  safeConf: 0.60, bold: 'hw' },  // 瑞士
   '084': { safe: 'w',  safeConf: 0.55, bold: 'hw' },  // 葡萄牙
-  '077': { safe: 'l',  safeConf: 0.55, bold: 'hl' },  // 科特迪瓦客胜
-  '079': { safe: 'w',  safeConf: 0.50, bold: 'hw' },  // 墨西哥
-  '081': { safe: 'w',  safeConf: 0.45, bold: 'l'  }   // 比利时（最不稳，激进反向）
+  '081': { safe: 'w',  safeConf: 0.42, bold: 'l'  },  // 比利时（最不稳，激进反向）
+  '086': { safe: 'l',  safeConf: 0.40, bold: 'hd' }   // 埃及客胜（难判断场，激进走让+1平）
 };
 
 /* 工具：根据 pick key 取赔率和名称 */
@@ -912,50 +944,32 @@ function generateCombos(n) {
 
 /* 用户预测置信度映射（用于自定义计算）*/
 const AI_CONFIDENCE = {
-  '077': { l: 0.55, w: 0.18, d: 0.27 },
-  '078': { w: 0.85, d: 0.10, l: 0.05 },
-  '079': { w: 0.50, d: 0.30, l: 0.20 },
   '080': { w: 0.85, d: 0.10, l: 0.05 },
-  '081': { w: 0.40, d: 0.28, l: 0.32 },
+  '081': { w: 0.42, d: 0.28, l: 0.30 },
   '082': { w: 0.80, d: 0.13, l: 0.07 },
   '083': { w: 0.80, d: 0.14, l: 0.06 },
   '084': { w: 0.55, d: 0.28, l: 0.17 },
-  '085': { w: 0.60, d: 0.25, l: 0.15 }
+  '085': { w: 0.60, d: 0.25, l: 0.15 },
+  '086': { w: 0.28, d: 0.32, l: 0.40 },
+  '087': { w: 0.88, d: 0.09, l: 0.03 },
+  '088': { w: 0.72, d: 0.18, l: 0.10 }
 };
 
 /* v3.2: 爆冷预警 — 当大热门赔率过低被市场严重看好，但存在历史/状态/伤病的爆冷可能 */
 const UPSET_RISK = {
-  '077': { risk: 15, side: null,     reason: '双方实力接近，无明显爆冷信号' },
-  '078': { risk: 22, side: '法国',   reason: '法国大热被严重看好，瑞典主场尚有抵抗空间' },
-  '079': { risk: 18, side: null,     reason: '主队优势明显，常规场' },
   '080': { risk: 35, side: '英格兰', reason: '英格兰小组赛历史多次爆冷 + 刚果防守韧性强 + 赔率过低市场过热' },
   '081': { risk: 25, side: '比利时', reason: '比利时近年大赛多次令人失望，塞内加尔防守稳健' },
-  '082': { risk: 20, side: null,     reason: '美国本土赛事 8 连胜，状态压制波兰' },
+  '082': { risk: 18, side: null,     reason: '美国本土赛事 8 连胜，状态压制波黑' },
   '083': { risk: 12, side: null,     reason: '西班牙状态稳定，奥地利缺顶级射手' },
   '084': { risk: 45, side: '葡萄牙', reason: 'C 罗替补 + B 费体能存疑 + 克罗地亚 2022 已淘汰多支强队 + 葡萄牙赔率被高估' },
-  '085': { risk: 28, side: null,     reason: '阿根廷阵容更强，瑞士主场加完整阵容可抗衡' }
+  '085': { risk: 28, side: null,     reason: '瑞士主场加完整阵容，阿尔及利亚防守韧性尚可但缺顶级火力' },
+  '086': { risk: 52, side: '澳大利亚', reason: '澳大利亚主胜赔率偏高但市场倾向埃及，萨拉赫客战状态成疑点' },
+  '087': { risk: 15, side: null,     reason: '阿根廷签运+实力碾压，佛得角几乎无爆冷路径' },
+  '088': { risk: 20, side: null,     reason: '哥伦比亚阵容完整，加纳体能充沛但难成气候' }
 };
 
 /* 每场关键影响因素（天气 / 球队状态 / 伤病停赛 / 历史交锋）*/
 const FACTORS = {
-  '077': {
-    weather: '☁️ 多云 19℃ 微风',
-    form:    '📈 挪威近5战4胜 哈兰德7球',
-    injury:  '✅ 双方主力齐整',
-    h2h:     '🤝 近5次挪威3胜2平'
-  },
-  '078': {
-    weather: '☀️ 晴 24℃ 适宜',
-    form:    '🔥 法国近6战不败 锋线火力全开',
-    injury:  '⚠️ 瑞典伊萨克因伤缺阵',
-    h2h:     '👑 近5次法国4胜1平'
-  },
-  '079': {
-    weather: '🌦️ 阵雨 21℃',
-    form:    '📈 墨西哥主场近10战8胜',
-    injury:  '⚠️ 厄瓜多尔主门停赛',
-    h2h:     '🤝 近交锋墨西哥3胜1平1负'
-  },
   '080': {
     weather: '☁️ 多云 17℃',
     form:    '🔥 英格兰近5战全胜',
@@ -991,6 +1005,24 @@ const FACTORS = {
     form:    '📈 瑞士欧洲杯8强延续强势',
     injury:  '✅ 扎卡+沙奇里+索默健康',
     h2h:     '🆕 历史首次正式交锋'
+  },
+  '086': {
+    weather: '☁️ 多云 20℃',
+    form:    '📊 埃及非洲杯亚军状态延续 / 澳大利亚小组赛险胜出线',
+    injury:  '⚠️ 萨拉赫轻伤上场存疑',
+    h2h:     '🤝 历史交锋2胜1平1负均势'
+  },
+  '087': {
+    weather: '☀️ 晴 26℃',
+    form:    '🔥 阿根廷小组赛3战全胜进8球',
+    injury:  '✅ 梅西+劳塔罗+阿尔瓦雷斯齐整',
+    h2h:     '🆕 历史首次正式交锋'
+  },
+  '088': {
+    weather: '☀️ 晴 24℃',
+    form:    '🔥 哥伦比亚小组赛2胜1平进4球',
+    injury:  '✅ J罗+迪亚斯+杜兰健康',
+    h2h:     '👑 近3次哥伦比亚2胜1平'
   }
 };
 
@@ -1110,7 +1142,30 @@ function togglePick(no, key) {
 /* Tab2 渲染 */
 function renderAI() {
   const root = document.getElementById('pane-ai');
-  let html = `<div class="combo-section-title">🤖 AI 综合预测 <span class="small">稳健派 + 冲冷派 + 爆冷预警 · 不只跟着赔率走</span></div>`;
+  let html = `
+    <div class="track-record">
+      <div class="track-title">📊 AI 预测战绩（1/16 决赛 7/1 场次）</div>
+      <div class="track-grid">
+        <div class="track-item hit">
+          <div class="track-match">077 科特迪瓦 vs 挪威</div>
+          <div class="track-pred">AI 稳健：<b>挪威客胜 @1.80</b></div>
+          <div class="track-result">实际：1-2 挪威胜 <span class="track-badge ok">✓ 命中</span></div>
+        </div>
+        <div class="track-item hit">
+          <div class="track-match">078 法国 vs 瑞典</div>
+          <div class="track-pred">AI 稳健：<b>法国主胜 @1.16</b></div>
+          <div class="track-result">实际：3-0 法国胜 <span class="track-badge ok">✓ 命中</span></div>
+        </div>
+        <div class="track-item hit">
+          <div class="track-match">079 墨西哥 vs 厄瓜多尔</div>
+          <div class="track-pred">AI 稳健：<b>墨西哥主胜 @2.02</b></div>
+          <div class="track-result">实际：2-0 墨西哥胜 <span class="track-badge ok">✓ 命中</span></div>
+        </div>
+      </div>
+      <div class="track-summary">✅ 3 战 3 中 · 稳健派全对，冲冷派 079 押平失手</div>
+    </div>
+    <div class="combo-section-title">🤖 AI 综合预测 <span class="small">稳健派 + 冲冷派 + 爆冷预警 · 不只跟着赔率走</span></div>
+  `;
   MATCHES.forEach(m => {
     const ai = m.ai;
     const opts = calcEVOptions(m);
@@ -1350,8 +1405,8 @@ function renderCombo() {
   </div>
 
   <div class="footer">
-    ⚽ 世界杯智能投注助手 v3.2 · 稳健 vs 冲冷 · 爆冷预警<br>
-    数据快照：2026-06-30 20:39 · 共 9 场（编号 077-085）
+    ⚽ 世界杯智能投注助手 v3.3 · 稳健 vs 冲冷 · 爆冷预警<br>
+    数据快照：2026-07-01 12:22 · 共 9 场（编号 080-088）· 已完赛 3 场 AI 预测全中 ✅
   </div>
   `;
   root.innerHTML = html;
